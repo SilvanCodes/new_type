@@ -1,8 +1,15 @@
 [package]
 name = "new_type"
 version = "0.1.0"
-authors = ["Silvan Buedenbender <silvan@claiv.de>"]
+authors = ["Silvan Buedenbender <SilvanCodes@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "Improve the semantics and correctness of your code by embracing newtypes."
+homepage = "https://github.com/SilvanCodes/new_type"
+repository = "https://github.com/SilvanCodes/new_type"
+readme = "README.md"
+keywords = ["macro", "newtype"]
+categories = ["rust-patterns"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
