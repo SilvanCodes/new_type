@@ -1,5 +1,5 @@
 [package]
-name = "newtype"
+name = "new_type"
 version = "0.1.0"
 authors = ["Silvan Buedenbender <silvan@claiv.de>"]
 edition = "2018"
