@@ -18,6 +18,21 @@
 /// assert_eq!(count_one + count_two, Count(150))
 /// # }
 /// ```
+/// Newtypes can be simple function arguments with default types:
+/// ```rust
+/// # #[macro_use] extern crate new_type;
+/// # fn main() {
+/// // We specify default type here!
+/// newtype!(Count: usize);
+///
+/// fn add_count(a: Count, b: Count) -> Count {
+///     a + b
+/// }
+///
+/// // We can add 'Count' because we can add usize!
+/// assert_eq!(add_count(Count(100), Count(50)), Count(150))
+/// # }
+/// ```
 /// Functions are available on newtypes:
 /// ```rust
 /// # #[macro_use] extern crate new_type;
