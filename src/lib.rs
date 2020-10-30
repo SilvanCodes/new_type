@@ -1,9 +1,9 @@
 /// Implements its arguments as newtypes.
 ///
 /// The macro is meant to provide easy means to enhance the semantics of language built-ins.
-/// Newtypes come with Deref, DerefMut, AsRef, AsMut, and From traits.
-/// Further they implement almost all std::ops and std::cmp of the type they wrap.
-/// Exceptions are std::ops::{Drop, Fn, FnMut, FnOnce, Index, IndexMut, RangeBounds}.
+/// Newtypes come with `Deref`, `DerefMut`, `AsRef`, `AsMut`, and `From` traits.
+/// Further they implement almost all std::ops and std::cmp of the type they wrap if the operants have value semantics and return `Self`.
+/// Exceptions are std::ops::{`Drop`, `Fn`, `FnMut`, `FnOnce`, `Index`, `IndexMut`, `RangeBounds`}.
 ///
 /// # Examples
 ///
@@ -27,11 +27,11 @@
 /// let mut some_humans = Humans(HashSet::new());
 /// some_humans.insert("Maria");
 /// some_humans.insert("Peter");
-/// let mut set = HashSet::new();
-/// set.insert("Kim");
-/// set.insert("Mia");
-/// // We can extend Humans with a HashSet!
-/// some_humans.extend(set.iter());
+/// let mut other_humans = Humans(HashSet::new());
+/// other_humans.insert("Kim");
+/// other_humans.insert("Mia");
+/// // We can extend Humans with Humans!
+/// some_humans.extend(other_humans.iter());
 /// // We can ask for '.len()' on Humans because we can ask for '.len()' on HashSet!
 /// assert_eq!(some_humans.len(), 4)
 /// # }
@@ -49,10 +49,10 @@
 /// ```
 #[macro_export]
 macro_rules! newtype {
-    ( $( $newtype:ident ),* ) => {
+    ( $( $newtype:ident $( : $default:ty )? ),* ) => {
         $(
             #[derive(Debug)]
-            pub struct $newtype<T>(pub T);
+            pub struct $newtype<T $( =$default )? >(pub T);
 
             impl<T> std::convert::From<T> for $newtype<T> {
                 fn from(other: T) -> Self {
