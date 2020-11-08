@@ -1,9 +1,13 @@
 /// Implements its arguments as newtypes.
 ///
 /// The macro is meant to provide easy means to enhance the semantics of language built-ins.
+///
 /// Newtypes come with `Deref`, `DerefMut`, `AsRef`, `AsMut`, and `From` traits.
 /// Further they implement almost all std::ops and std::cmp of the type they wrap if the operants have value semantics and return `Self`.
 /// Exceptions are std::ops::{`Drop`, `Fn`, `FnMut`, `FnOnce`, `Index`, `IndexMut`, `RangeBounds`}.
+///
+/// Usually one obtains instances of the newtype by the public constructor but `Default` is available if the wrapped type implements it.
+/// It is not as ergonomic as it should be though, see examples below.
 ///
 /// # Examples
 ///
@@ -33,16 +37,17 @@
 /// assert_eq!(add_count(Count(100), Count(50)), Count(150))
 /// # }
 /// ```
-/// Functions are available on newtypes:
+/// Functions and defaults are available on newtypes:
 /// ```rust
 /// # #[macro_use] extern crate new_type;
 /// # use std::collections::HashSet;
 /// # fn main() {
-/// newtype!(Humans);
-/// let mut some_humans = Humans(HashSet::new());
+/// newtype!(Humans: HashSet<&'static str>);
+/// // Sadly we need to specify `Humans` as type in order to get access to `Default`.
+/// let mut some_humans: Humans = Humans::default();
 /// some_humans.insert("Maria");
 /// some_humans.insert("Peter");
-/// let mut other_humans = Humans(HashSet::new());
+/// let mut other_humans: Humans = Humans::default();
 /// other_humans.insert("Kim");
 /// other_humans.insert("Mia");
 /// // We can extend Humans with Humans!
@@ -68,6 +73,12 @@ macro_rules! newtype {
         $(
             #[derive(Debug)]
             pub struct $newtype<T $( =$default )? >(pub T);
+
+            impl<T: Default> Default for $newtype<T> {
+                fn default() -> Self {
+                    Self(T::default())
+                }
+            }
 
             impl<T> std::convert::From<T> for $newtype<T> {
                 fn from(other: T) -> Self {
