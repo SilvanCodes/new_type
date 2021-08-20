@@ -150,6 +150,14 @@ macro_rules! newtype {
                 }
             }
 
+            // std::hash::Hash implementation
+
+            impl<T: std::hash::Hash> std::hash::Hash for $newtype<T> {
+                fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+                    self.0.hash(state);
+                }
+            }
+
             // std::ops implementations
 
             impl<T: std::ops::Add<Output = T>> std::ops::Add for $newtype<T> {
