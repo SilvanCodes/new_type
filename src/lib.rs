@@ -74,7 +74,13 @@ macro_rules! newtype {
             #[derive(Debug)]
             pub struct $newtype<T $( =$default )? >(pub T);
 
-            impl<T: Default> Default for $newtype<T> {
+            impl<U, T: std::iter::FromIterator<U>> std::iter::FromIterator<U> for $newtype<T> {
+                fn from_iter<I: IntoIterator<Item=U>>(iter: I) -> Self {
+                    Self(T::from_iter(iter))
+                }
+            }
+
+            impl<T: std::default::Default> std::default::Default for $newtype<T> {
                 fn default() -> Self {
                     Self(T::default())
                 }
