@@ -1,3 +1,63 @@
+//! # Welcome, fellow programmer! 👋🏼
+//!
+//!  The newtype macro is very simple:
+//!
+//! ```rust
+//! # #[macro_use] extern crate new_type;
+//! # fn main() {
+//! newtype!(Meters, Centimeters);
+//!
+//! let distance_one = Meters(10);
+//! let distance_two = Meters(5);
+//! let distance_three = Centimeters(5);
+//!
+//! // Successfully add the same type.
+//! assert_eq!(distance_one + distance_two, Meters(15))
+//!
+//! // Compilation error: expected struct `Meters`, found struct `Centimeters`
+//! // assert_eq!(distance_one + distance_three, Meters(15))
+//! # }
+//! ```
+//!
+//! # Under the hood ⚙️
+//!
+//! The newtype is implemented with a generic type parameter.
+//! Via this type parameter it does kind of a "type level derive" i.e. it implements operations by deferring to the implementation of the underlying type.
+//! That works across any level of nested newtypes, if that should be of any use.
+//! For details read on in [newtype].
+//!
+//! # Footgun Warning ⚠️
+//!
+//! It is highly recommended to explicitly pass the expexted types into the tuple constructor as by default any type goes due to the generic type parameter.
+//! This is definetly a footgun but as the generic type parameter is core to how this crate operates not obviously avoidable. Open a PR is you have ideas.
+//!
+//! ```rust
+//! # #[macro_use] extern crate new_type;
+//! # fn main() {
+//! // We specify a default type.
+//! // The default type is only relevant for calls to T::default() and only if there is no reason for the compiler to infer another type.
+//! newtype!(Meters: f32);
+//!
+//! // Footgun right here, we pass an integer, so it will be an i32.
+//! let distance_one = Meters(10);
+//!
+//! // Footgun possible here, we pass a float, so it would be a f64 by default.
+//! // Because we add it with an explicit f32 type the compiler can infer it needs to be an f32 as well.
+//! let distance_two = Meters(5.0);
+//!
+//! // The recommended way to construct values of the newtype.
+//! let distance_three = Meters(5.0_f32);
+//!
+//! assert_eq!(distance_two + distance_three, Meters(10.0));
+//!
+//! // Compilation error: expected integer, found floating-point number
+//! // assert_eq!(distance_one + distance_two, Meters(15))
+//!
+//! // Footgun here, f64 is infered for the call to T::default() despite f32 being the default type parameter.
+//! assert_eq!(Meters::default(), Meters(0.0_f64));
+//! # }
+//! ```
+
 /// Implements its arguments as newtypes.
 ///
 /// The macro is meant to provide easy means to enhance the semantics of language built-ins.
